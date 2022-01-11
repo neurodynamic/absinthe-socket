@@ -7,53 +7,61 @@ import notifierRemove from "./notifier/remove";
 import refreshNotifier from "./refreshNotifier";
 import requestStatuses from "./notifier/requestStatuses";
 import updateNotifiers from "./updateNotifiers";
-import {unsubscribe} from "./subscription";
+import { unsubscribe } from "./subscription";
 
-import type {AbsintheSocket} from "./types";
-import type {Notifier} from "./notifier/types";
+import type { AbsintheSocket } from "./types";
+import type { Notifier } from "./notifier/types";
 
-const cancelQueryOrMutationSending = (absintheSocket, notifier) =>
-  updateNotifiers(
+const cancelQueryOrMutationSending = function (absintheSocket, notifier) {
+  return updateNotifiers(
     absintheSocket,
     notifierRefresh(notifierFlushCanceled(notifierCancel(notifier)))
   );
+}
 
-const cancelQueryOrMutationIfSending = (absintheSocket, notifier) =>
-  notifier.requestStatus === requestStatuses.sending
+const cancelQueryOrMutationIfSending = function (absintheSocket, notifier) {
+  return notifier.requestStatus === requestStatuses.sending
     ? cancelQueryOrMutationSending(absintheSocket, notifier)
     : absintheSocket;
+}
 
-const cancelPending = (absintheSocket, notifier) =>
-  updateNotifiers(
+const cancelPending = function (absintheSocket, notifier) {
+  return updateNotifiers(
     absintheSocket,
     notifierRemove(notifierFlushCanceled(notifierCancel(notifier)))
   );
+}
 
-const cancelQueryOrMutation = (absintheSocket, notifier) =>
-  notifier.requestStatus === requestStatuses.pending
+const cancelQueryOrMutation = function (absintheSocket, notifier) {
+  return notifier.requestStatus === requestStatuses.pending
     ? cancelPending(absintheSocket, notifier)
     : cancelQueryOrMutationIfSending(absintheSocket, notifier);
+}
 
-const unsubscribeIfNeeded = (absintheSocket, notifier) =>
-  notifier.requestStatus === requestStatuses.sent
+const unsubscribeIfNeeded = function (absintheSocket, notifier) {
+  return notifier.requestStatus === requestStatuses.sent
     ? unsubscribe(absintheSocket, notifier)
     : absintheSocket;
+}
 
-const cancelNonPendingSubscription = (absintheSocket, notifier) =>
-  unsubscribeIfNeeded(
+const cancelNonPendingSubscription = function (absintheSocket, notifier) {
+  return unsubscribeIfNeeded(
     absintheSocket,
     refreshNotifier(absintheSocket, notifierCancel(notifier))
   );
+}
 
-const cancelSubscription = (absintheSocket, notifier) =>
-  notifier.requestStatus === requestStatuses.pending
+const cancelSubscription = function (absintheSocket, notifier) {
+  return notifier.requestStatus === requestStatuses.pending
     ? cancelPending(absintheSocket, notifier)
     : cancelNonPendingSubscription(absintheSocket, notifier);
+}
 
-const cancelActive = (absintheSocket, notifier) =>
-  notifier.operationType === "subscription"
+const cancelActive = function (absintheSocket, notifier) {
+  return notifier.operationType === "subscription"
     ? cancelSubscription(absintheSocket, notifier)
     : cancelQueryOrMutation(absintheSocket, notifier);
+}
 
 /**
  * Cancels a notifier sending a Cancel event to all its observers and
@@ -64,10 +72,11 @@ const cancelActive = (absintheSocket, notifier) =>
  *
  * withAbsintheSocket.cancel(absintheSocket, notifier);
  */
-const cancel = (
+const cancel = function (
   absintheSocket: AbsintheSocket,
   notifier: Notifier<any, any>
-): AbsintheSocket =>
-  notifier.isActive ? cancelActive(absintheSocket, notifier) : absintheSocket;
+): AbsintheSocket {
+  return notifier.isActive ? cancelActive(absintheSocket, notifier) : absintheSocket;
+}
 
 export default cancel;

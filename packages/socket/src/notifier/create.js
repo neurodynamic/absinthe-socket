@@ -20,9 +20,10 @@ const createUsing = function (request, operationType) {
   });
 }
 
-const create = <Variables: void | Object > (
-  request: GqlRequest<Variables>
-    ): Notifier<any, $Subtype<Variables>> =>
-      createUsing(request, getOperationType(request.operation));
+const create = function <Variables: void | Object > (
+  request: GqlRequest < Variables >
+    ): Notifier < any, $Subtype < Variables >> {
+  return createUsing(request, getOperationType(request.operation));
+}
 
-      export default create;
+export default create;

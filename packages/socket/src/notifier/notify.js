@@ -2,17 +2,19 @@
 
 import observerNotifyAll from "./observer/notifyAll";
 
-import type {Event, Notifier} from "./types";
+import type { Event, Notifier } from "./types";
 
-const getObservers = ({activeObservers, canceledObservers}) => [
-  ...activeObservers,
-  ...canceledObservers
-];
+const getObservers = function ({ activeObservers, canceledObservers }) {
+  return [
+    ...activeObservers,
+    ...canceledObservers
+  ];
+}
 
-const notify = <Result, Variables: void | Object>(
-  notifier: Notifier<Result, Variables>,
-  event: Event
-) => {
+const notify = function <Result, Variables: void | Object > (
+  notifier: Notifier < Result, Variables >,
+    event: Event
+) {
   observerNotifyAll(getObservers(notifier), event);
 
   return notifier;

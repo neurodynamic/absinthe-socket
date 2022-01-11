@@ -11,29 +11,37 @@ import type {
   StartEvent
 } from "../types";
 
-const createStartEvent = <Payload: Notifier<any, any>>(
+const createStartEvent = function <Payload: Notifier< any, any>> (
   payload: Payload
-): StartEvent<Payload> => ({payload, name: eventNames.start});
+): StartEvent < Payload > { return({ payload, name: eventNames.start });}
 
-const createResultEvent = <Result>(payload: Result): ResultEvent<Result> => ({
-  payload,
-  name: eventNames.result
-});
+const createResultEvent = function <Result>(payload: Result): ResultEvent<Result> {
+  return ({
+    payload,
+    name: eventNames.result
+  });
+}
 
-const createErrorEvent = (payload: Error): ErrorEvent => ({
-  payload,
-  name: eventNames.error
-});
+const createErrorEvent = function (payload: Error): ErrorEvent {
+  return ({
+    payload,
+    name: eventNames.error
+  });
+}
 
-const createCancelEvent = (): CancelEvent => ({
-  name: eventNames.cancel,
-  payload: undefined
-});
+const createCancelEvent = function (): CancelEvent {
+  return ({
+    name: eventNames.cancel,
+    payload: undefined
+  });
+}
 
-const createAbortEvent = (payload: Error): AbortEvent => ({
-  payload,
-  name: eventNames.abort
-});
+const createAbortEvent = function (payload: Error): AbortEvent {
+  return ({
+    payload,
+    name: eventNames.abort
+  });
+}
 
 export {
   createStartEvent,
