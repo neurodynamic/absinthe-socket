@@ -1,8 +1,8 @@
 // @flow
 
-import {Socket as PhoenixSocket} from "phoenix";
+import { Socket as PhoenixSocket } from "phoenix";
 
-import type {Message} from "phoenix";
+import type { Message } from "phoenix";
 
 import abortNotifier from "./abortNotifier";
 import joinChannel from "./joinChannel";
@@ -12,28 +12,32 @@ import notifierReset from "./notifier/reset";
 import refreshNotifier from "./refreshNotifier";
 import updateNotifiers from "./updateNotifiers";
 import * as withSubscription from "./subscription";
-import {createErrorEvent} from "./notifier/event/eventCreators";
+import { createErrorEvent } from "./notifier/event/eventCreators";
 
-import type {AbsintheSocket} from "./types";
+import type { AbsintheSocket } from "./types";
 
-const onMessage = absintheSocket => (message: Message<>) => {
-  if (withSubscription.isDataMessage(message)) {
-    withSubscription.onDataMessage(absintheSocket, message);
+const onMessage = function (absintheSocket) {
+  return function (message: Message<>) {
+    if (withSubscription.isDataMessage(message)) {
+      withSubscription.onDataMessage(absintheSocket, message);
+    }
   }
 };
 
-const createConnectionCloseError = () => new Error("connection: close");
+const createConnectionCloseError = function () { return new Error("connection: close"); }
 
-const notifyConnectionCloseError = notifier =>
+const notifyConnectionCloseError = function (notifier) {
   notifierNotify(notifier, createErrorEvent(createConnectionCloseError()));
+}
 
-const notifierOnConnectionCloseCanceled = (absintheSocket, notifier) =>
-  updateNotifiers(
+const notifierOnConnectionCloseCanceled = function (absintheSocket, notifier) {
+  return updateNotifiers(
     absintheSocket,
     notifierRemove(notifyConnectionCloseError(notifier))
   );
+}
 
-const notifierOnConnectionCloseActive = (absintheSocket, notifier) => {
+const notifierOnConnectionCloseActive = function (absintheSocket, notifier) {
   if (notifier.operationType === "mutation") {
     abortNotifier(absintheSocket, notifier, createConnectionCloseError());
   } else {
@@ -44,23 +48,31 @@ const notifierOnConnectionCloseActive = (absintheSocket, notifier) => {
   }
 };
 
-const notifierOnConnectionClose = absintheSocket => notifier => {
-  if (notifier.isActive) {
-    notifierOnConnectionCloseActive(absintheSocket, notifier);
-  } else {
-    notifierOnConnectionCloseCanceled(absintheSocket, notifier);
+const notifierOnConnectionClose = function (absintheSocket) {
+  return function (notifier) {
+    if (notifier.isActive) {
+      notifierOnConnectionCloseActive(absintheSocket, notifier);
+    } else {
+      notifierOnConnectionCloseCanceled(absintheSocket, notifier);
+    }
   }
 };
 
-const onConnectionClose = absintheSocket => () =>
-  absintheSocket.notifiers.forEach(notifierOnConnectionClose(absintheSocket));
+const onConnectionClose = function (absintheSocket) {
+  return function () {
+    return absintheSocket.notifiers.forEach(notifierOnConnectionClose(absintheSocket));
+  }
+}
 
-const shouldJoinChannel = absintheSocket =>
-  !absintheSocket.channelJoinCreated && absintheSocket.notifiers.length > 0;
+const shouldJoinChannel = function (absintheSocket) {
+  return !absintheSocket.channelJoinCreated && absintheSocket.notifiers.length > 0;
+}
 
-const onConnectionOpen = absintheSocket => () => {
-  if (shouldJoinChannel(absintheSocket)) {
-    joinChannel(absintheSocket);
+const onConnectionOpen = function (absintheSocket) {
+  return function () {
+    if (shouldJoinChannel(absintheSocket)) {
+      joinChannel(absintheSocket);
+    }
   }
 };
 
@@ -77,7 +89,7 @@ const absintheChannelName = "__absinthe__:control";
  *   new PhoenixSocket("ws://localhost:4000/socket")
  * );
  */
-const create = (phoenixSocket: PhoenixSocket): AbsintheSocket => {
+const create = function (phoenixSocket: PhoenixSocket): AbsintheSocket {
   const absintheSocket: AbsintheSocket = {
     phoenixSocket,
     channel: phoenixSocket.channel(absintheChannelName),
