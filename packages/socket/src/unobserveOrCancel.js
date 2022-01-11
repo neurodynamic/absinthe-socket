@@ -20,13 +20,14 @@ const doUnobserveOrCancel = (absintheSocket, notifier, observer) =>
  *
  * withAbsintheSocket.unobserve(absintheSocket, notifier, observer);
  */
-const unobserveOrCancel = <Result, Variables: void | Object>(
+const unobserveOrCancel = function<Result, Variables: void | Object>(
   absintheSocket: AbsintheSocket,
   notifier: Notifier<Result, Variables>,
   observer: Observer<Result, Variables>
-) =>
-  notifier.isActive
+) {
+  return notifier.isActive
     ? doUnobserveOrCancel(absintheSocket, notifier, observer)
     : absintheSocket;
+};
 
 export default unobserveOrCancel;

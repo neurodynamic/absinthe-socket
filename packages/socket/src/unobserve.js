@@ -7,7 +7,7 @@ import updateNotifiers from "./updateNotifiers";
 import type {AbsintheSocket} from "./types";
 import type {Notifier, Observer} from "./notifier/types";
 
-const ensureHasActiveObserver = (notifier, observer) => {
+const ensureHasActiveObserver = function(notifier, observer) {
   if (notifier.activeObservers.includes(observer)) return notifier;
 
   throw new Error("Observer is not attached to notifier");
@@ -21,16 +21,17 @@ const ensureHasActiveObserver = (notifier, observer) => {
  *
  * withAbsintheSocket.unobserve(absintheSocket, notifier, observer);
  */
-const unobserve = (
+const unobserve = function(
   absintheSocket: AbsintheSocket,
   notifier: Notifier<any, any>,
   observer: Observer<any, any>
-): AbsintheSocket =>
-  updateNotifiers(
+): AbsintheSocket {
+  return updateNotifiers(
     absintheSocket,
     notifierRefresh(
       notifierUnobserve(ensureHasActiveObserver(notifier, observer), observer)
     )
   );
+};
 
 export default unobserve;

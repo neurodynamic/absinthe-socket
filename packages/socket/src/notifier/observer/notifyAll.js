@@ -2,14 +2,21 @@
 
 import type {Event, Observer} from "../types";
 
-const getNotifier = (handlerName, payload) => observer =>
-  observer[handlerName] && observer[handlerName](payload);
+const getNotifier = function(handlerName, payload) {
+  return function(observer) {
+    return observer[handlerName] && observer[handlerName](payload);
+  };
+};
 
-const getHandlerName = ({name}) => `on${name}`;
+const getHandlerName = function({name}) {
+  return `on${name}`;
+};
 
-const notifyAll = <Result, Variables: void | Object>(
+const notifyAll = function<Result, Variables: void | Object>(
   observers: $ReadOnlyArray<Observer<Result, Variables>>,
   event: Event
-) => observers.forEach(getNotifier(getHandlerName(event), event.payload));
+) {
+  return observers.forEach(getNotifier(getHandlerName(event), event.payload));
+};
 
 export default notifyAll;

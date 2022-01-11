@@ -13,50 +13,66 @@ import {createErrorEvent} from "./notifier/event/eventCreators";
 import type {AbsintheSocket, NotifierPushHandler} from "./types";
 import type {Notifier} from "./notifier/types";
 
-const pushAbsintheDocEvent = (absintheSocket, {request}, notifierPushHandler) =>
-  pushAbsintheEvent(
+const pushAbsintheDocEvent = function(
+  absintheSocket,
+  {request},
+  notifierPushHandler
+) {
+  return pushAbsintheEvent(
     absintheSocket,
     request,
     notifierPushHandler,
     createAbsintheDocEvent(requestToCompat(request))
   );
+};
 
-const setNotifierRequestStatusSending = (absintheSocket, notifier) =>
-  refreshNotifier(absintheSocket, {
+const setNotifierRequestStatusSending = function(absintheSocket, notifier) {
+  return refreshNotifier(absintheSocket, {
     ...notifier,
     requestStatus: requestStatuses.sending
   });
+};
 
-const createRequestError = message => {
+const createRequestError = function(message) {
   const error = new Error(`request: ${message}`);
   error.object = message;
 
   return error;
 };
 
-const onTimeout = (absintheSocket, notifier) =>
-  notifierNotifyActive(
+const onTimeout = function(absintheSocket, notifier) {
+  return notifierNotifyActive(
     notifier,
     createErrorEvent(createRequestError("timeout"))
   );
+};
 
-const onError = (
+const onError = function(
   absintheSocket: AbsintheSocket,
   notifier: Notifier<any, any>,
   errorMessage: string
-) => abortNotifier(absintheSocket, notifier, createRequestError(errorMessage));
+) {
+  return abortNotifier(
+    absintheSocket,
+    notifier,
+    createRequestError(errorMessage)
+  );
+};
 
-const getNotifierPushHandler = onSucceed => ({onError, onSucceed, onTimeout});
+const getNotifierPushHandler = function(onSucceed) {
+  return {onError, onSucceed, onTimeout};
+};
 
-const pushRequestUsing = (
+const pushRequestUsing = function(
   absintheSocket: AbsintheSocket,
   notifier: Notifier<any, any>,
   onSucceed: $ElementType<NotifierPushHandler<any>, "onSucceed">
-) =>
-  pushAbsintheDocEvent(
+) {
+  return pushAbsintheDocEvent(
     absintheSocket,
     setNotifierRequestStatusSending(absintheSocket, notifier),
     getNotifierPushHandler(onSucceed)
   );
+};
 
 export {pushRequestUsing as default, onError};

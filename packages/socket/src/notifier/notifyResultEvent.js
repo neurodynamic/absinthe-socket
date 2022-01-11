@@ -5,9 +5,11 @@ import {createResultEvent} from "./event/eventCreators";
 
 import type {Notifier} from "./types";
 
-const notifyResultEvent = <Result, Variables: void | Object>(
+const notifyResultEvent = function<Result, Variables: void | Object>(
   notifier: Notifier<Result, Variables>,
   result: Result
-) => notifyActive(notifier, createResultEvent(result));
+) {
+  return notifyActive(notifier, createResultEvent(result));
+};
 
 export default notifyResultEvent;
